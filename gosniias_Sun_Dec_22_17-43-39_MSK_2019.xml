@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="gosniias" default="all">
+  
+  
+  <property file="gosniias.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.yarb/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.egg"/>
+    <include name="*.jar"/>
+    <include name="*.ear"/>
+    <include name="*.klib"/>
+    <include name="*.swc"/>
+    <include name="*.war"/>
+    <include name="*.zip"/>
+    <include name="*.ane"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+  <path id="jdk.classpath.1.8">
+    <fileset dir="${jdk.home.1.8}">
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/ext/access-bridge-64.jar"/>
+      <include name="jre/lib/ext/cldrdata.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/jaccess.jar"/>
+      <include name="jre/lib/ext/jfxrt.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/nashorn.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/sunmscapi.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/jfxswt.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/rt.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.gwt-user.classpath">
+    <pathelement location="${basedir}/../gwt-user.jar"/>
+  </path>
+  
+  <path id="library.postgresql-42.2.5.classpath">
+    <pathelement location="${basedir}/postgresql-42.2.5.jar"/>
+  </path>
+  
+  <path id="library.sqlite-jdbc-3.21.0.1.classpath">
+    <pathelement location="${basedir}/../../../Загрузки/sqlite-jdbc-3.21.0.1.jar"/>
+  </path>
+  
+  
+  <!-- Application Server Libraries -->
+  
+  <path id="library.tomcat_8.0.29.classpath">
+    <pathelement location="D:/Dropbox/Projects/apache-tomcat-9.0.24/lib/jsp-api.jar"/>
+    <pathelement location="D:/Dropbox/Projects/apache-tomcat-9.0.24/lib/servlet-api.jar"/>
+  </path>
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <fileset dir="${javac2.home}">
+      <include name="javac2.jar"/>
+      <include name="jdom.jar"/>
+      <include name="asm-all*.jar"/>
+      <include name="forms-*.jar"/>
+    </fileset>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  <import file="${basedir}/module_gosniias.xml"/>
+  
+  <target name="clean.gwt.compiler.output" description="Clean GWT Compiler output directories">
+    <delete dir="${gwt.compiler.output.gosniias}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.gosniias, clean.artifact.gosniias:web_exploded, clean.artifact.gosniias:web_exploded_devmode, clean.gwt.compiler.output" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.gwt.gosniias" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.gosniias:web_exploded" value="${basedir}/out/artifacts/GosNiiAs_Web_exploded"/>
+    <property name="artifact.output.gosniias:web_exploded_devmode" value="${basedir}/out/artifacts/GosNiiAs_Web_exploded_DevMode"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="clean.artifact.gosniias:web_exploded" description="clean GosNiiAs:Web exploded artifact output">
+    <delete dir="${artifact.output.gosniias:web_exploded}"/>
+  </target>
+  
+  <target name="clean.artifact.gosniias:web_exploded_devmode" description="clean GosNiiAs:Web exploded DevMode artifact output">
+    <delete dir="${artifact.output.gosniias:web_exploded_devmode}"/>
+  </target>
+  
+  <target name="artifact.gosniias:web_exploded" depends="init.artifacts, compile.module.gosniias" description="Build &#39;GosNiiAs:Web exploded&#39; artifact">
+    <mkdir dir="${artifact.output.gosniias:web_exploded}"/>
+    <mkdir dir="${artifact.output.gosniias:web_exploded}/WEB-INF"/>
+    <mkdir dir="${artifact.output.gosniias:web_exploded}/WEB-INF/classes"/>
+    <copy todir="${artifact.output.gosniias:web_exploded}/WEB-INF/classes">
+      <fileset dir="${gosniias.output.dir}"/>
+    </copy>
+    <mkdir dir="${artifact.output.gosniias:web_exploded}/WEB-INF/lib"/>
+    <copy file="${basedir}/../gwt-servlet.jar" tofile="${artifact.output.gosniias:web_exploded}/WEB-INF/lib/gwt-servlet.jar"/>
+    <copy todir="${artifact.output.gosniias:web_exploded}">
+      <fileset dir="${gwt.compiler.output.gosniias}"/>
+    </copy>
+    <copy todir="${artifact.output.gosniias:web_exploded}">
+      <fileset dir="${basedir}/war"/>
+    </copy>
+    <mkdir dir="${artifact.output.gosniias:web_exploded}/WEB-INF"/>
+    <copy file="${basedir}/war/WEB-INF/web.xml" tofile="${artifact.output.gosniias:web_exploded}/WEB-INF/web.xml"/>
+  </target>
+  
+  <target name="artifact.gosniias:web_exploded_devmode" depends="init.artifacts, compile.module.gosniias" description="Build &#39;GosNiiAs:Web exploded DevMode&#39; artifact">
+    <mkdir dir="${artifact.output.gosniias:web_exploded_devmode}"/>
+    <mkdir dir="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF"/>
+    <mkdir dir="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF/classes"/>
+    <copy todir="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF/classes">
+      <fileset dir="${gosniias.output.dir}"/>
+    </copy>
+    <mkdir dir="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF/lib"/>
+    <copy file="${basedir}/../gwt-servlet.jar" tofile="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF/lib/gwt-servlet.jar"/>
+    <copy todir="${artifact.output.gosniias:web_exploded_devmode}">
+      <fileset dir="${basedir}/war"/>
+    </copy>
+    <mkdir dir="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF"/>
+    <copy file="${basedir}/war/WEB-INF/web.xml" tofile="${artifact.output.gosniias:web_exploded_devmode}/WEB-INF/web.xml"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.gosniias:web_exploded, artifact.gosniias:web_exploded_devmode" description="Build all artifacts">
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

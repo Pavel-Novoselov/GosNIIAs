@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_gosniias" default="compile.module.gosniias">
+  <dirname property="module.gosniias.basedir" file="${ant.file.module_gosniias}"/>
+  
+  <property name="module.jdk.home.gosniias" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.gosniias" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.gosniias" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.gosniias" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="gosniias.output.dir" value="${module.gosniias.basedir}/out/production/GosNiiAs"/>
+  <property name="gosniias.testoutput.dir" value="${module.gosniias.basedir}/out/test/GosNiiAs"/>
+  
+  <path id="gosniias.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="gosniias.module.production.classpath">
+    <path refid="${module.jdk.classpath.gosniias}"/>
+    <path refid="library.tomcat_8.0.29.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.sqlite-jdbc-3.21.0.1.classpath"/>
+    <path refid="library.postgresql-42.2.5.classpath"/>
+  </path>
+  
+  <path id="gosniias.runtime.production.module.classpath">
+    <pathelement location="${gosniias.output.dir}"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.sqlite-jdbc-3.21.0.1.classpath"/>
+    <path refid="library.postgresql-42.2.5.classpath"/>
+  </path>
+  
+  <path id="gosniias.module.classpath">
+    <path refid="${module.jdk.classpath.gosniias}"/>
+    <pathelement location="${gosniias.output.dir}"/>
+    <path refid="library.tomcat_8.0.29.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.sqlite-jdbc-3.21.0.1.classpath"/>
+    <path refid="library.postgresql-42.2.5.classpath"/>
+  </path>
+  
+  <path id="gosniias.runtime.module.classpath">
+    <pathelement location="${gosniias.testoutput.dir}"/>
+    <pathelement location="${gosniias.output.dir}"/>
+    <path refid="library.tomcat_8.0.29.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.sqlite-jdbc-3.21.0.1.classpath"/>
+    <path refid="library.postgresql-42.2.5.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.gosniias">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.gosniias">
+    <patternset refid="excluded.from.module.gosniias"/>
+  </patternset>
+  
+  <path id="gosniias.module.sourcepath">
+    <dirset dir="${module.gosniias.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.gosniias" depends="compile.module.gosniias.production,compile.module.gosniias.tests" description="Compile module GosNiiAs"/>
+  
+  <target name="compile.module.gosniias.production" depends="register.custom.compilers" description="Compile module GosNiiAs; production classes">
+    <mkdir dir="${gosniias.output.dir}"/>
+    <javac2 destdir="${gosniias.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.gosniias}/javac">
+      <compilerarg line="${compiler.args.gosniias}"/>
+      <bootclasspath refid="gosniias.module.bootclasspath"/>
+      <classpath refid="gosniias.module.production.classpath"/>
+      <src refid="gosniias.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.gosniias"/>
+    </javac2>
+    
+    <copy todir="${gosniias.output.dir}">
+      <fileset dir="${module.gosniias.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.gosniias.tests" depends="register.custom.compilers,compile.module.gosniias.production" description="compile module GosNiiAs; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.gosniias" description="cleanup module">
+    <delete dir="${gosniias.output.dir}"/>
+    <delete dir="${gosniias.testoutput.dir}"/>
+  </target>
+  
+  <property name="gwt.compiler.output.gosniias" value="${module.gosniias.basedir}/GWTCompilerOutput_gosniias"/>
+  
+  <!-- Run GWT compiler for GWT module ${gwt.module.name} -->
+  <target name="run.gwt.compiler.gosniias" description="Run GWT compiler">
+    <java fork="true" jvm="${module.jdk.bin.gosniias}/java" classname="com.google.gwt.dev.Compiler" failonerror="true">
+      <jvmarg line="-Xmx1024m"/>
+      <classpath>
+        <pathelement location="${gwt.sdk.home.gosniias}/gwt-dev.jar"/>
+        <path refid="gosniias.module.sourcepath"/>
+        <path refid="gosniias.module.classpath"/>
+      </classpath>
+      <arg value="-logLevel"/>
+      <arg value="WARN"/>
+      <arg value="-war"/>
+      <arg value="${gwt.compiler.output.gosniias}"/>
+      <arg value="-style"/>
+      <arg value="DETAILED"/>
+      <arg value="${gwt.module.name}"/>
+    </java>
+  </target>
+  
+  <target name="compile.gwt.gosniias" depends="compile.module.gosniias" description="Compile all GWT modules in module GosNiiAs">
+    <property name="gwt.sdk.home.gosniias" value="${gwt.sdk.home}"/>
+    <antcall target="run.gwt.compiler.gosniias">
+      <param name="gwt.module.name" value="com.mySampleApplication.MySampleApplication"/>
+    </antcall>
+  </target>
+</project>
